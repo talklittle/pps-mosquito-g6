@@ -10,12 +10,12 @@ import mosquito.sim.Collector;
 import mosquito.sim.Light;
 import mosquito.sim.Player;
 
-public class DumbPlayer0 extends Player {
+public class MosquitoBuster extends Player {
 	private int numLights;
 	
 	@Override
 	public String getName() {
-		return "Dumb Player 0";
+		return "Mosquito Buster";
 	}
 
 	@Override
