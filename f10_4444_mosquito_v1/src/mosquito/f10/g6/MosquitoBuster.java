@@ -43,7 +43,7 @@ public class MosquitoBuster extends Player {
 		{
 			// select location until we are not within 20 meters of any wall. or stop after 10 tries.
 			for (int numTries = 0; numTries < 10; numTries++) {
-				lastLight = new Point2D.Double(l.getX()+14,l.getY()+14);
+				lastLight = new Point2D.Double(l.getX()-(14*Math.cos((i-1)*2*Math.PI/(numLights-1))),(l.getY()-(14*Math.sin((i-1)*2*Math.PI/(numLights-1)))));
 				if (!isNearWall(lastLight, 20)) {
 					// if we found a spot that is not near a wall, then keep it
 					logger.debug("point ("+lastLight.getX()+","+lastLight.getY()+") not near wall");
