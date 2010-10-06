@@ -23,6 +23,8 @@ public class MosquitoBuster extends Player {
 		return "Mosquito Buster";
 	}
 
+	//test
+	
 	@Override
 	public void startNewGame(Set<Line2D> walls, int NumLights) {
 		this.walls = walls;
