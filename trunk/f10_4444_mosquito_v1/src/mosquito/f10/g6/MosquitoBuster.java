@@ -22,8 +22,6 @@ public class MosquitoBuster extends Player {
 	public String getName() {
 		return "Mosquito Buster";
 	}
-
-	//test
 	
 	@Override
 	public void startNewGame(Set<Line2D> walls, int NumLights) {
@@ -48,7 +46,10 @@ public class MosquitoBuster extends Player {
 				}
 				logger.debug("point ("+lastLight.getX()+","+lastLight.getY()+") NEAR WALL. numTries="+numTries);
 			}
-			Light l = new Light(lastLight.getX(),lastLight.getY(), 10,r.nextInt(10),1);
+			Light l = new Light(lastLight.getX(),lastLight.getY(), 10,5,1);
+			if(i==(numLights-1)){
+				l = new Light(lastLight.getX(),lastLight.getY(), 1,1,1);
+			}
 			ret.add(l);
 		}
 		return ret;
@@ -74,14 +75,14 @@ public class MosquitoBuster extends Player {
 		// for 1 light, just place it near the light
 		if (numLights == 1) {
 			Random r = new Random();
-			Collector c = new Collector(lastLight.getX()+1,lastLight.getY() +1);
+			Collector c = new Collector(lastLight.getX()+0.1,lastLight.getY() +0.1);
 			return c;
 		}
 		// for more than 1 light, place collector between the 2 closest lights
 		else {
 			// FIXME replace this
 			Random r = new Random();
-			Collector c = new Collector(lastLight.getX()+1,lastLight.getY() +1);
+			Collector c = new Collector(lastLight.getX()+0.1,lastLight.getY() +0.1);
 			return c;
 		}
 	}
