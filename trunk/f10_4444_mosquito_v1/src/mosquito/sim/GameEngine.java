@@ -25,6 +25,7 @@ import mosquito.sim.ui.GUI;
 import mosquito.sim.ui.Text;
 
 import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
 
 public final class GameEngine 
 {
@@ -35,6 +36,9 @@ public final class GameEngine
 	private ArrayList<GameListener> gameListeners;
 	private Logger log;
 	
+    static {
+		PropertyConfigurator.configure("logger.properties");
+    }
 	public GameEngine(String configFile)
 	{
 		config = new GameConfig(configFile);
