@@ -46,7 +46,7 @@ public class MosquitoBuster extends Player {
 				}
 				logger.debug("point ("+lastLight.getX()+","+lastLight.getY()+") NEAR WALL. numTries="+numTries);
 			}
-			Light l = new Light(lastLight.getX(),lastLight.getY(), 10,5,1);
+			Light l = new Light(lastLight.getX(),lastLight.getY(), 10,1,1);
 			if(i==(numLights-1)){
 				l = new Light(lastLight.getX(),lastLight.getY(), 1,1,1);
 			}
