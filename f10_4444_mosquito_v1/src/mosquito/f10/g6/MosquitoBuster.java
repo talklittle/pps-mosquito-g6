@@ -34,11 +34,16 @@ public class MosquitoBuster extends Player {
 	public Set<Light> getLights() {
 		HashSet<Light> ret = new HashSet<Light>();
 		Random r = new Random();
-		for(int i = 0; i<numLights;i++)
+		Light l = new Light(50,50, 1,1,1);
+		while(isNearWall(l.getLocation(), 20)){
+			l = new Light(l.getX()+1,l.getY()+1, 1,1,1);
+		}
+		ret.add(l);
+		for(int i = 1; i<numLights;i++)
 		{
 			// select location until we are not within 20 meters of any wall. or stop after 10 tries.
 			for (int numTries = 0; numTries < 10; numTries++) {
-				lastLight = new Point2D.Double(r.nextInt(100), r.nextInt(100));
+				lastLight = new Point2D.Double(l.getX()+14,l.getY()+14);
 				if (!isNearWall(lastLight, 20)) {
 					// if we found a spot that is not near a wall, then keep it
 					logger.debug("point ("+lastLight.getX()+","+lastLight.getY()+") not near wall");
@@ -46,10 +51,7 @@ public class MosquitoBuster extends Player {
 				}
 				logger.debug("point ("+lastLight.getX()+","+lastLight.getY()+") NEAR WALL. numTries="+numTries);
 			}
-			Light l = new Light(lastLight.getX(),lastLight.getY(), 10,1,1);
-			if(i==(numLights-1)){
-				l = new Light(lastLight.getX(),lastLight.getY(), 1,1,1);
-			}
+			l = new Light(lastLight.getX(),lastLight.getY(), 10,1,1);
 			ret.add(l);
 		}
 		return ret;
@@ -75,14 +77,16 @@ public class MosquitoBuster extends Player {
 		// for 1 light, just place it near the light
 		if (numLights == 1) {
 			Random r = new Random();
-			Collector c = new Collector(lastLight.getX()+0.1,lastLight.getY() +0.1);
+			//Collector c = new Collector(lastLight.getX()+0.1,lastLight.getY() +0.1);
+			Collector c = new Collector(50+0.1,50 +0.1);
 			return c;
 		}
 		// for more than 1 light, place collector between the 2 closest lights
 		else {
 			// FIXME replace this
 			Random r = new Random();
-			Collector c = new Collector(lastLight.getX()+0.1,lastLight.getY() +0.1);
+			//Collector c = new Collector(lastLight.getX()+0.1,lastLight.getY() +0.1);
+			Collector c = new Collector(50+0.1,50 +0.1);
 			return c;
 		}
 	}
