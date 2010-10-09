@@ -24,24 +24,33 @@ public class Grp6Blank3 extends Player {
 	}
 
 	Point2D firstLight = null;
-	//Point2D secondLight = null;
-	//Point2D thirdLight = null;
+	Point2D secondLight = null;
+	Point2D thirdLight = null;
 	
 	@Override
 	public Set<Light> getLights() {
 		HashSet<Light> ret = new HashSet<Light>();
 	
 		firstLight = new Point2D.Double(50, 50);
-		Light l = new Light(firstLight.getX(),firstLight.getY(), 1,10,1);
-			
-		ret.add(l);
+		secondLight = new Point2D.Double(30.1, 50);
+		thirdLight = new Point2D.Double(69.9, 50);
+		
+		Light firstL = new Light(firstLight.getX(),firstLight.getY(), 1,1,1);
+		ret.add(firstL);
+		
+		Light secondL = new Light(secondLight.getX(), secondLight.getY(),40, 20, 1);
+		ret.add(secondL);
+		
+		Light thirdL = new Light(thirdLight.getX(), thirdLight.getY(),40, 20, 1);
+		ret.add(thirdL);
+		
 		return ret;
 	}
 
 	@Override
 	public Collector getCollector() {
 		Random r = new Random();
-		Collector c = new Collector(firstLight.getX()+1,firstLight.getY() +1);
+		Collector c = new Collector(firstLight.getX()+0.5,firstLight.getY() +0.5);
 		return c;
 	}
 
