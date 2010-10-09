@@ -6,18 +6,13 @@
  */
 package mosquito.sim;
 
-import java.awt.Point;
 import java.awt.geom.Line2D;
-import java.awt.geom.Point2D;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.ConcurrentModificationException;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Random;
 import java.util.Set;
 
 import mosquito.sim.GameListener.GameUpdateType;
@@ -33,12 +28,28 @@ public final class GameEngine
 	private Board board;
 	// private PlayerWrapper player;
 	private int round;
+	public GUI gui;
 	private ArrayList<GameListener> gameListeners;
 	private Logger log;
-	
-    static {
+	public boolean isSimulated = false;
+	static {
 		PropertyConfigurator.configure("logger.properties");
-    }
+	}
+	public GameEngine(GameConfig config)
+	{
+		this.config = (GameConfig) config.clone();
+		gameListeners = new ArrayList<GameListener>();
+		board = new Board(10, 10);
+		board.engine=this;
+		this.isSimulated = true;
+			try {
+				board.load(config.getSelectedBoard());
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+	    log = Logger.getLogger(GameController.class);
+	}
 	public GameEngine(String configFile)
 	{
 		config = new GameConfig(configFile);
@@ -74,7 +85,10 @@ public final class GameEngine
 	{
 		return board;
 	}
-
+	public int getNumCaught()
+	{
+		return board.mosquitosCaught;
+	}
 	public boolean step()
 	{
 		if(board.mosquitosCaught >= config.getNumMosquitos()/2 || (config.getMaxRounds() > 0 && getCurrentRound() >= config.getMaxRounds()))
@@ -89,7 +103,7 @@ public final class GameEngine
 			{
 				if(!m.caught)
 				{
-					int d = board.getDirectionOfLight(m.location);
+					double d = board.getDirectionOfLight(m.location);
 					m.moveInDirection(d,board.getWalls());
 					if(board.getCollector().contains(m))
 					{
@@ -120,6 +134,14 @@ public final class GameEngine
 	public void removeGameListener(GameListener l)
 	{
 		gameListeners.remove(l);
+	}
+	public void notifyRepaint()
+	{
+		Iterator<GameListener> it = gameListeners.iterator();
+		while (it.hasNext())
+		{
+			it.next().gameUpdated(GameUpdateType.REPAINT);
+		}
 	}
 	private void notifyListeners(GameUpdateType type)
 	{
@@ -190,8 +212,13 @@ public final class GameEngine
 			board.mosquitosCaught = 0;
 			board.setLights(new HashSet<Light>());
 			curPlayer = config.getPlayerClass().newInstance();
+			curPlayer.setMyConfig((GameConfig) config.clone());
+			curPlayer.setGUI(gui);
 			curPlayer.Register();
-			curPlayer.startNewGame(board.getWalls(), config.getNumLights());
+			if(this.isSimulated)
+				curPlayer.startSimulatedGame(board.getWalls(), config.getNumLights());
+			else
+				curPlayer.startNewGame(board.getWalls(), config.getNumLights());
 			board.createMosquitos(0);
 			if(config.getPlayerClass().getName().equals("mosquito.g0.InteractivePlayer"))
 			{
@@ -234,6 +261,17 @@ public final class GameEngine
 						System.err.println("Error: Collector intersects light");
 						return false;
 					}
+					if(l.getX() < 0 || l.getX() > 100 || l.getY() < 0 || l.getY() > 100)
+					{
+						System.err.println("Error: Lights are OOB");
+						System.err.println(l.getX() + ", " + l.getY());
+						return false;
+					}
+				}
+				if(col.getX() < 0 || col.getX() > 100 || col.getY() < 0 || col.getY() > 100)
+				{
+					System.err.println("Error: Collector is OOB");
+					return false;
 				}
 				board.setCollector(col);
 				board.createMosquitos(config.getNumMosquitos());
