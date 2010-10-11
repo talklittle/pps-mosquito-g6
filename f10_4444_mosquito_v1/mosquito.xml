@@ -4,7 +4,7 @@
 <properties>
 	<comment>A sample configuration file.</comment>
 	
-	<entry key="mosquito.classes">mosquito.g0.DumbPlayer0 mosquito.g0.InteractivePlayer mosquito.g0.DumbPlayer1 mosquito.g6.MosquitoBuster mosquito.g6.Grp6Blank3 mosquito.g6.Blank10</entry>
+	<entry key="mosquito.classes">mosquito.g0.DumbPlayer0 mosquito.g0.InteractivePlayer mosquito.g0.DumbPlayer1 mosquito.g6.MosquitoBuster mosquito.g6.Grp6Blank3 mosquito.g6.Grp6Blank10 mosquito.g6.Grp6Y3 mosquito.g6.Grp6Y10</entry>
 
   <!--	<entry key ="mosquito.seed">102223023</entry>-->
 	
