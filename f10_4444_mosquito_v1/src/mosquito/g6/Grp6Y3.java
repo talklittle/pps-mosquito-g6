@@ -31,14 +31,14 @@ public class Grp6Y3 extends Player {
 	public Set<Light> getLights() {
 		HashSet<Light> ret = new HashSet<Light>();
 	
-		firstLight = new Point2D.Double(45, 20);
-		secondLight = new Point2D.Double(62.5, 26);
-		thirdLight = new Point2D.Double(80, 35.5);
+		firstLight = new Point2D.Double(45, 80);
+		secondLight = new Point2D.Double(62.5, 74);
+		thirdLight = new Point2D.Double(79.5, 65.5);
 		
-		Light firstL = new Light(firstLight.getX(),firstLight.getY(), 1,1,1);
+		Light firstL = new Light(firstLight.getX(),firstLight.getY(), 40,20,1);
 		ret.add(firstL);
 		
-		Light secondL = new Light(secondLight.getX(), secondLight.getY(),40, 20, 1);
+		Light secondL = new Light(secondLight.getX(), secondLight.getY(),1, 1, 1);
 		ret.add(secondL);
 		
 		Light thirdL = new Light(thirdLight.getX(), thirdLight.getY(),40, 20, 1);
@@ -50,7 +50,7 @@ public class Grp6Y3 extends Player {
 	@Override
 	public Collector getCollector() {
 		Random r = new Random();
-		Collector c = new Collector(firstLight.getX()+0.5,firstLight.getY() +0.5);
+		Collector c = new Collector(secondLight.getX()+0.5,secondLight.getY() +0.5);
 		return c;
 	}
 
