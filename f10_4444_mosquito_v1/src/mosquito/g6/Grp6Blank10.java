@@ -33,7 +33,7 @@ public class Grp6Blank10 extends Player {
 	Point2D seventhLight = null;
 	Point2D eighthLight = null;
 	Point2D ninthLight = null;
-	//Point2D tenthLight = null;
+	Point2D tenthLight = null;
 	
 	@Override
 	public Set<Light> getLights() {
@@ -53,6 +53,7 @@ public class Grp6Blank10 extends Player {
 		seventhLight = new Point2D.Double(69.9, 30.1);
 		eighthLight = new Point2D.Double(30.1, 69.9);
 		ninthLight = new Point2D.Double(69.9, 69.9);
+		tenthLight = new Point2D.Double(1,1);
 		
 		// center light
 		Light firstL = new Light(firstLight.getX(),firstLight.getY(), 1,1,1);
@@ -84,7 +85,8 @@ public class Grp6Blank10 extends Player {
 		Light ninthL = new Light(ninthLight.getX(), ninthLight.getY(),60, 20, 1);
 		ret.add(ninthL);
 		
-		
+		Light tenthL = new Light(tenthLight.getX(), tenthLight.getY(),1, 0, 1);
+		ret.add(tenthL);
 		
 		return ret;
 	}
