@@ -15,6 +15,7 @@ import org.apache.log4j.Logger;
 public class MosquitoBuster extends Player {
 	private int numLights;
 	private Set<Line2D> walls;
+	private HashSet<Light> lights;
 	
 	private static final Random random = new Random();
 	
@@ -34,7 +35,7 @@ public class MosquitoBuster extends Player {
 	Point2D lastLight = null;
 	@Override
 	public Set<Light> getLights() {
-		HashSet<Light> ret = new HashSet<Light>();
+		lights = new HashSet<Light>();
 		Random r = new Random();
 		Light l = new Light(50,50, 1,1,1);
 		while(isNearWall(l.getLocation(), 20) && l.getX() < 98 && l.getY() < 98){
@@ -45,7 +46,7 @@ public class MosquitoBuster extends Player {
 			l = new Light(random.nextDouble() * 99.0, random.nextDouble() * 99.0, 1,1,1);
 		}
 		
-		ret.add(l);
+		lights.add(l);
 		for(int i = 1; i<numLights;i++)
 		{
 			// select location until we are not within 20 meters of any wall. or stop after 10 tries.
@@ -59,9 +60,9 @@ public class MosquitoBuster extends Player {
 				logger.debug("point ("+lastLight.getX()+","+lastLight.getY()+") NEAR WALL. numTries="+numTries);
 			}
 			l = new Light(lastLight.getX(),lastLight.getY(), 10,1,1);
-			ret.add(l);
+			lights.add(l);
 		}
-		return ret;
+		return lights;
 	}
 	
 	/**
@@ -78,14 +79,37 @@ public class MosquitoBuster extends Player {
 		}
 		return false;
 	}
+	
+	private boolean isIntersectingLight(Point2D point) {
+		for (Light light : lights) {
+			if (point.distance(light.getLocation()) < 0.5)
+				return true;
+		}
+		return false;
+	}
 
 	@Override
 	public Collector getCollector() {
+		Point2D collectorLocation = new Point2D.Double(lastLight.getX()+0.1, lastLight.getY()+0.1);
+		// move collector slightly if it's on a wall
+		while (isNearWall(collectorLocation, 0.5) && collectorLocation.getX() < 99 && collectorLocation.getY() < 99)
+			collectorLocation = new Point2D.Double(collectorLocation.getX()+0.1, collectorLocation.getY()+0.1);
+		// XXX if all else fails, use random location
+		while (isNearWall(collectorLocation, 0.5))
+			collectorLocation = new Point2D.Double(random.nextDouble() * 99.0, random.nextDouble() * 99.0);
+		
+		// move collector if it's on a light
+		while (isIntersectingLight(collectorLocation) && collectorLocation.getX() < 99 && collectorLocation.getY() < 99)
+			collectorLocation = new Point2D.Double(collectorLocation.getX()+0.1, collectorLocation.getY()+0.1);
+		// XXX if all else fails, use random location
+		while (isIntersectingLight(collectorLocation))
+			collectorLocation = new Point2D.Double(random.nextDouble() * 99.0, random.nextDouble() * 99.0);
+		
 		// for 1 light, just place it near the light
 		if (numLights == 1) {
 			Random r = new Random();
 			//Collector c = new Collector(lastLight.getX()+0.1,lastLight.getY() +0.1);
-			Collector c = new Collector(50+0.1,50 +0.1);
+			Collector c = new Collector(collectorLocation.getX(), collectorLocation.getY());
 			return c;
 		}
 		// for more than 1 light, place collector between the 2 closest lights
@@ -93,7 +117,7 @@ public class MosquitoBuster extends Player {
 			// FIXME replace this
 			Random r = new Random();
 			//Collector c = new Collector(lastLight.getX()+0.1,lastLight.getY() +0.1);
-			Collector c = new Collector(50+0.1,50 +0.1);
+			Collector c = new Collector(collectorLocation.getX(), collectorLocation.getY());
 			return c;
 		}
 	}
