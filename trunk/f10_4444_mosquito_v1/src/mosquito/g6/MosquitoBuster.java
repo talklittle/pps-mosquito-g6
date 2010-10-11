@@ -16,6 +16,8 @@ public class MosquitoBuster extends Player {
 	private int numLights;
 	private Set<Line2D> walls;
 	
+	private static final Random random = new Random();
+	
 	private static final Logger logger = Logger.getLogger(MosquitoBuster.class);
 	
 	@Override
@@ -35,9 +37,14 @@ public class MosquitoBuster extends Player {
 		HashSet<Light> ret = new HashSet<Light>();
 		Random r = new Random();
 		Light l = new Light(50,50, 1,1,1);
-		while(isNearWall(l.getLocation(), 20)){
+		while(isNearWall(l.getLocation(), 20) && l.getX() < 98 && l.getY() < 98){
 			l = new Light(l.getX()+1,l.getY()+1, 1,1,1);
 		}
+		// make sure light is not on top of a wall
+		while (isNearWall(l.getLocation(), 1)) {
+			l = new Light(random.nextDouble() * 99.0, random.nextDouble() * 99.0, 1,1,1);
+		}
+		
 		ret.add(l);
 		for(int i = 1; i<numLights;i++)
 		{
