@@ -47,26 +47,50 @@ public class Geometry {
 		
 		HashSet<HashSet<Line2D> > regions = new HashSet<HashSet<Line2D> >();
 		
-		Set<Point2D> checkedIntersections = new HashSet<Point2D>();
+		// Set of points, helps to keep track while traversing list
+		HashSet<Point2D> checkedIntersections = new HashSet<Point2D>();
+		
+		// This foreach loop will end up processing each set of connected walls in groups.
+		// The getEndpoints method will update checkedIntersections, so later iterations
+		// of this foreach loop will not check points belonging to an
+		// enclosed region (set of connected walls).
 		for (Point2D intersectionPoint : intersectionMap.keySet()) {
-			// check points that have not been checked yet
-			if (!checkedIntersections.contains(intersectionPoint)) {
-				checkedIntersections.add(intersectionPoint);
-				
-				for (Line2D wall : intersectionMap.get(intersectionPoint)) {
-					// get the other endpoint of the line
-					Point2D otherPoint = intersectionPoint.equals(wall.getP1()) ? wall.getP2() : wall.getP1();
-					checkedIntersections.add(intersectionPoint);
-				}
-			}
+			// check each point, return endpoints of 1 connected set of walls
+			Set<Point2D> endpoints = getEndpoints(intersectionPoint, intersectionMap,
+					new HashSet<Point2D>(), checkedIntersections);
+			
+			// TODO Inspect the endpoints of this set of walls
+			//    like trying to connect endpoints together for the "U" map:
+			//   +------+
+			//   |      |
+			//   |  |_| |
+			//   |      |
+			//   +------+
+			
 		}
+			
 		return regions;
 	}
 	
-//	private void getRegionsCheckingHelper(Map<Point2D, Set<Line2D> > intersectionMap,
-//			???, Set<Point2D> checkedIntersections) {
-//		
-//	}
+	private static Set<Point2D> getEndpoints(
+			Point2D currentPoint,						// in
+			Map<Point2D, Set<Line2D> > intersectionMap,	// in
+			Set<Point2D> endpoints,						// in, may be modified
+			Set<Point2D> checkedIntersections			// inout
+			) {
+		// check points that have not been checked yet
+		if (!checkedIntersections.contains(currentPoint)) {
+			checkedIntersections.add(currentPoint);
+			
+			for (Line2D wall : intersectionMap.get(currentPoint)) {
+				// get the other endpoint of the line
+				Point2D otherPoint = currentPoint.equals(wall.getP1()) ? wall.getP2() : wall.getP1();
+				// keep recursively checking for endpoints, walking to connected points
+				endpoints.addAll(getEndpoints(otherPoint, intersectionMap, endpoints, checkedIntersections));
+			}
+		}
+		return endpoints;
+	}
 	
 	public static Set<Line2D> getExtendedWalls(Set<Line2D> walls) {
 		// TODO
