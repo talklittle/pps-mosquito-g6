@@ -11,9 +11,10 @@ public class ArrangedAreasAndSizes {
 		areas = allAreas;
 		sizes = new HashSet<Double>();
 		getSizes();
-		arrange();
+		//arrange();
 	}
 	
+	//wrong
 	private void arrange(){
 		int index = sizes.size();
 		double tempSize = 0.0,maxSize=0.0;
