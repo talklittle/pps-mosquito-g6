@@ -47,7 +47,7 @@ public class MosquitoBuster extends Player {
 					spots[i][j] = testAtSpot(i, j); // test at spot does simulation in that coordinate
 					if(j-1 >= 0)
 					{
-						if(spots[i][j] <= spots[i][j-1]);
+						if(spots[i][j] <= spots[i][j-1] && spots[i][j] != -1);
 						fastestCoordinate[0] = i;
 						fastestCoordinate[1] = j;
 					}
