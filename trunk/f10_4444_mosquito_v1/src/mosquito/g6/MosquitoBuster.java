@@ -17,7 +17,7 @@ import org.apache.log4j.Logger;
 public class MosquitoBuster extends Player {
 	private int numLights;
 	private Set<Line2D> walls;
-	private <Light> lights;
+	private Set<Light> lights;
 	private Board board;
 
 	
@@ -37,14 +37,24 @@ public class MosquitoBuster extends Player {
 	}
 
 	/* Brute force to go through each spot on the board and test from there */
-	public int[][] getStartSpot()
+	public int[] getStartSpot()
 	{
 		int[][] spots = new int[101][101];
+		int[] fastestCoordinate = {0,0};
 		
 		for (int i = 0; i < 101; i++) {
 			for (int j = 0; j < 101; j++) {
-					testAtSpot(i, j);
+					spots[i][j] = testAtSpot(i, j); // test at spot does simulation in that coordinate
+					if(j-1 >= 0)
+					{
+						if(spots[i][j] <= spots[i][j-1]);
+						fastestCoordinate[0] = i;
+						fastestCoordinate[1] = j;
+					}
 			}
+		}
+		
+		return fastestCoordinate;
 		
 	}
 	
@@ -53,7 +63,8 @@ public class MosquitoBuster extends Player {
 		
 		HashSet<Light> ret = new HashSet<Light>();
 		
-		ret = getLightPositions();
+		ret = getLightPositions(); // after start spot has been chosen, we decide light positions and this returns them
+		
 		
 		
 		return ret;
