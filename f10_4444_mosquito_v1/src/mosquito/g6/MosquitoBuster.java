@@ -37,17 +37,17 @@ public class MosquitoBuster extends Player {
 	}
 
 	/* Brute force to go through each spot on the board and test from there */
-	public int[] getStartSpot()
+	public double[] getStartSpot()
 	{
-		int[][] spots = new int[101][101];
-		int[] fastestCoordinate = {0,0};
+		double[][] spots = new double[101][101];
+		double[] fastestCoordinate = {0,0};
 		
-		for (int i = 0; i < 101; i++) {
-			for (int j = 0; j < 101; j++) {
+		for (double i = 0; i < 101; i+=0.5) {
+			for (double j = 0; j < 101; j+=0.5) {
 					spots[i][j] = testAtSpot(i, j); // test at spot does simulation in that coordinate
-					if(j-1 >= 0)
+					if(j-0.5 >= 0)
 					{
-						if(spots[i][j] <= spots[i][j-1] && spots[i][j] != -1);
+						if((spots[i][j] <= spots[i][j-0.5]) && (spots[i][j] != -1.0));
 						fastestCoordinate[0] = i;
 						fastestCoordinate[1] = j;
 					}
@@ -65,91 +65,7 @@ public class MosquitoBuster extends Player {
 		
 		ret = getLightPositions(); // after start spot has been chosen, we decide light positions and this returns them
 		
-		
-		
 		return ret;
-	}
-	
-	public Set<Light> placeLights(ArrangedAreasAndSizes allAreas){
-//		Set<Line2D> area = allAreas.areas.iterator().next();
-//		//Find center
-//		double maxX = 0,minX = 0,maxY = 0,minY = 0;
-//		Iterator<Line2D> iteratorArea = area.iterator();
-//		Line2D tempLine;
-//		while(iteratorArea.hasNext()){
-//			tempLine = iteratorArea.next();
-//			if(tempLine.getX1()>maxX){
-//				maxX = tempLine.getX1();
-//			}
-//			if(tempLine.getX2()>maxX){
-//				maxX = tempLine.getX2();
-//			}
-//			if(tempLine.getY1()>maxY){
-//				maxY = tempLine.getY1();
-//			}
-//			if(tempLine.getY2()>maxY){
-//				maxY = tempLine.getY2();
-//			}
-//			if(tempLine.getX1()<minX){
-//				minX = tempLine.getX1();
-//			}
-//			if(tempLine.getX2()<minX){
-//				minX = tempLine.getX2();
-//			}
-//			if(tempLine.getY1()<minY){
-//				minY = tempLine.getY1();
-//			}
-//			if(tempLine.getY2()<minY){
-//				minY = tempLine.getY2();
-//			}
-//		}
-//		double avgX = (maxX-minX)/2.0;
-//		double avgY = (maxY-minY)/2.0;
-		//place first light at center + avoid walls
-		double avgX = 50;
-		double avgY = 50;
-		while(isNearWall(new Point2D.Double(avgX,avgY),20) && avgX < 99 && avgY < 99) {
-			avgX +=0.1;
-			avgY +=0.1;
-		}
-		while(isNearWall(new Point2D.Double(avgX,avgY),1) || avgX > 99 || avgY > 99) {
-			avgX = random.nextDouble() * 99.0;
-			avgY = random.nextDouble() * 99.0;
-		}
-		
-		
-		Light light = new Light(avgX, avgY, 1, 1, 1);
-		firstLight = light.getLocation();
-		Set<Light> lights = new HashSet<Light>();
-		lights.add(light);
-		//place each phase's lights
-		double phase = 1;
-		double lightIndex = 0;
-		double x,y;
-		int num = numLights-1;
-		while(num>0){
-			if(lightIndex > 8){
-				lightIndex = 0;
-				phase++;
-			}
-			x = avgX+phase*19.8*(Math.cos(lightIndex*2*Math.PI/Math.min(8.0, (double)numLights-1.0)));
-			y = avgY+phase*19.8*(Math.sin(lightIndex*2*Math.PI/Math.min(8.0, (double)numLights-1.0)));
-			while(isNearWall(new Point2D.Double(x,y),20) && x < 99 && y < 99){
-				x +=0.1;
-				y +=0.1;
-			}
-			while(isNearWall(new Point2D.Double(x,y),1) || x > 99 || y > 99){
-				x = random.nextDouble() * 99.0;
-				y = random.nextDouble() * 99.0;
-			}
-			
-			light = new Light(x, y, 60, 20*phase, 1);
-			lights.add(light);
-			num--;
-			lightIndex++;
-		}
-		//return lights
-		return lights;
 	}
 	
 	/**
