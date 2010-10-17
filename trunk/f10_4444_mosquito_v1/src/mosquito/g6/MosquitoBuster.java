@@ -7,6 +7,7 @@ import java.util.Iterator;
 import java.util.Random;
 import java.util.Set;
 
+import mosquito.sim.Board;
 import mosquito.sim.Collector;
 import mosquito.sim.Light;
 import mosquito.sim.Player;
@@ -16,7 +17,9 @@ import org.apache.log4j.Logger;
 public class MosquitoBuster extends Player {
 	private int numLights;
 	private Set<Line2D> walls;
-	private Set<Light> lights;
+	private <Light> lights;
+	private Board board;
+
 	
 	private static final Random random = new Random();
 	
@@ -33,51 +36,27 @@ public class MosquitoBuster extends Player {
 		this.numLights = NumLights;
 	}
 
-	Point2D firstLight = null;
-	Point2D lastLight = null;
+	/* Brute force to go through each spot on the board and test from there */
+	public int[][] getStartSpot()
+	{
+		int[][] spots = new int[101][101];
+		
+		for (int i = 0; i < 101; i++) {
+			for (int j = 0; j < 101; j++) {
+					testAtSpot(i, j);
+			}
+		
+	}
+	
 	@Override
 	public Set<Light> getLights() {
-//		lights = new HashSet<Light>();
-//		Random r = new Random();
-//		Light l = new Light(50,50, 1,1,1);
-//		while(isNearWall(l.getLocation(), 20) && l.getX() < 98 && l.getY() < 98){
-//			l = new Light(l.getX()+1,l.getY()+1, 1,1,1);
-//		}
-//		// make sure light is not on top of a wall
-//		while (isNearWall(l.getLocation(), 1)) {
-//			l = new Light(random.nextDouble() * 99.0, random.nextDouble() * 99.0, 1,1,1);
-//		}
-//		
-//		lights.add(l);
-//		for(int i = 1; i<numLights;i++)
-//		{
-//			// select location until we are not within 20 meters of any wall. or stop after 10 tries.
-//			for (int numTries = 0; numTries < 10; numTries++) {
-//				lastLight = new Point2D.Double(l.getX()-(14*Math.cos((i-1)*2*Math.PI/(numLights-1))),(l.getY()-(14*Math.sin((i-1)*2*Math.PI/(numLights-1)))));
-//				if (!isNearWall(lastLight, 20)) {
-//					// if we found a spot that is not near a wall, then keep it
-//					logger.debug("point ("+lastLight.getX()+","+lastLight.getY()+") not near wall");
-//					break;
-//				}
-//				logger.debug("point ("+lastLight.getX()+","+lastLight.getY()+") NEAR WALL. numTries="+numTries);
-//			}
-//			l = new Light(lastLight.getX(),lastLight.getY(), 10,1,1);
-//			lights.add(l);
-//		}
-//		return lights;
 		
-		//dummy~
-		Set<Set<Line2D> > dummyRegions = new HashSet<Set<Line2D> >();
-		HashSet<Line2D> dummyRegion = new HashSet<Line2D>();
-		dummyRegion.add(new Line2D.Double(0.0, 0.0, 0.0, 99.0));
-		dummyRegion.add(new Line2D.Double(0.0, 99.0, 99.0, 99.0));
-		dummyRegion.add(new Line2D.Double(99.0, 99.0, 99.0, 0.0));
-		dummyRegion.add(new Line2D.Double(99.0, 0.0, 0.0, 0.0));
-		dummyRegions.add(dummyRegion);
-		ArrangedAreasAndSizes arrange = new ArrangedAreasAndSizes(dummyRegions);
-		lights = placeLights(arrange);
-		return lights;
-		//end of dummy~
+		HashSet<Light> ret = new HashSet<Light>();
+		
+		ret = getLightPositions();
+		
+		
+		return ret;
 	}
 	
 	public Set<Light> placeLights(ArrangedAreasAndSizes allAreas){
