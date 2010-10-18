@@ -42,10 +42,10 @@ public class MosquitoBuster extends Player {
 
 	@Override
 	public void startNewGame(Set<Line2D> walls, int NumLights) {
+		beginTime = System.currentTimeMillis();
 		this.walls = walls;
 		this.numLights = NumLights;
 		this.lights = getLightPositions();
-		beginTime = System.currentTimeMillis();
 	}
 
 	@Override
@@ -88,8 +88,10 @@ public class MosquitoBuster extends Player {
 			}
 			
 			// stop after CUTOFF_MILLIS milliseconds
-			if (System.currentTimeMillis() - beginTime > CUTOFF_MILLIS)
+			if (System.currentTimeMillis() - beginTime > CUTOFF_MILLIS) {
+				logger.warn("exceeded "+CUTOFF_MILLIS+" millis. stopping");
 				break;
+			}
 		}
 
 		return fastestCoordinate;
