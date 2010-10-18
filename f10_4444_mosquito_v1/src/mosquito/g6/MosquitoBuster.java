@@ -4,6 +4,7 @@ import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Random;
 import java.util.Set;
@@ -25,7 +26,10 @@ public class MosquitoBuster extends Player {
 	private static Set<Light> lights;
 	private static Point2D initialLightLocation;
 	
+	private static long beginTime, endTime;
+	
 	private static final int NUM_REPETITIONS = 1;
+	private static final long CUTOFF_MILLIS = 54 * 60 * 1000;
 
 	private static final Random random = new Random();
 
@@ -41,6 +45,7 @@ public class MosquitoBuster extends Player {
 		this.walls = walls;
 		this.numLights = NumLights;
 		this.lights = getLightPositions();
+		beginTime = System.currentTimeMillis();
 	}
 
 	@Override
@@ -58,20 +63,33 @@ public class MosquitoBuster extends Player {
 	/* Brute force to go through each spot on the board and test from there */
 	public double[] getStartSpot()
 	{
-		double[][] spots = new double[2*101][2*101];
+		double[][] spots = new double[2*100][2*100];
 		double[] fastestCoordinate = {0,0};
-
+		
+		// Create a random order of testing
+		ArrayList<double[]> spotsToTry = new ArrayList<double[]>();
 		for (double i = 0; i < 100; i+=0.5) {
 			for (double j = 0; j < 100; j+=0.5) {
-				spots[(int) (2*i)][(int) (2*j)] = testAtSpot(i, j); // test at spot does simulation in that coordinate
-				if(j-0.5 >= 0)
-				{
-					if((spots[(int) (2*i)][(int) (2*j)] <= spots[(int) (2*i)][(int) (2*(j-0.5))])
-							&& (spots[(int) (2*i)][(int) (2*j)] != -1.0));
-					fastestCoordinate[0] = i;
-					fastestCoordinate[1] = j;
-				}
+				spotsToTry.add(new double[] {i,j});
 			}
+		}
+		Collections.shuffle(spotsToTry);
+
+		for (int i = 0; i < spotsToTry.size(); i++) {
+			double x = spotsToTry.get(i)[0];
+			double y = spotsToTry.get(i)[1];
+			spots[(int) (2*x)][(int) (2*y)] = testAtSpot(x, y); // test at spot does simulation in that coordinate
+			if(y-0.5 >= 0)
+			{
+				if((spots[(int) (2*x)][(int) (2*y)] <= spots[(int) (2*x)][(int) (2*(y-0.5))])
+						&& (spots[(int) (2*x)][(int) (2*y)] != -1.0));
+				fastestCoordinate[0] = x;
+				fastestCoordinate[1] = y;
+			}
+			
+			// stop after CUTOFF_MILLIS milliseconds
+			if (System.currentTimeMillis() - beginTime > CUTOFF_MILLIS)
+				break;
 		}
 
 		return fastestCoordinate;
@@ -153,7 +171,7 @@ public class MosquitoBuster extends Player {
 				public void gameUpdated(GameUpdateType type) {
 					if(type.equals(GameUpdateType.MOVEPROCESSED))
 					{
-						logger.info("We had a move happen, " + getSimulationRounds() +", caught: " + getSimulationNumCaught());
+						logger.trace("We had a move happen, " + getSimulationRounds() +", caught: " + getSimulationNumCaught());
 					}
 					else if(type.equals(GameUpdateType.GAMEOVER))
 					{
@@ -172,6 +190,12 @@ public class MosquitoBuster extends Player {
 				minRounds = mapRounds.get(key);
 				minKey = key;
 			}
+		}
+		Set<Light> bestLights = mapLights.get(minKey);
+		logger.info("Found set of best lights with minRounds="+minRounds);
+		for (Light light : bestLights) {
+			logger.info("x="+light.getX()+" y="+light.getY());
+//			logger.info(" d="+light.getD()+" t="+light.getT()+" s="+light.getS());
 		}
 		return mapLights.get(minKey);
 	}
