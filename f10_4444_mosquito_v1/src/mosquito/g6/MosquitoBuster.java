@@ -24,6 +24,7 @@ public class MosquitoBuster extends Player {
 	private static Set<Light> lights;
 	private static Point2D initialLightLocation;
 	
+	private static final int NUM_REPETITIONS = 10;
 
 	private static final Random random = new Random();
 
@@ -77,7 +78,7 @@ public class MosquitoBuster extends Player {
 	}
 
 	/**
-	 * Run the tests 30 times and get the average number of rounds
+	 * Run the tests repeatedly and get the average number of rounds
 	 * @param x
 	 * @param y
 	 * @return
@@ -88,9 +89,12 @@ public class MosquitoBuster extends Player {
 
 		initialLightLocation = new Point2D.Double(x, y);
 
-		for (int i = 0; i < 30; i++) {
-			double radians = i * (2.0 * Math.PI / 30.0);
+		for (int i = 0; i < NUM_REPETITIONS; i++) {
+			double radians = i * (2.0 * Math.PI / (double) NUM_REPETITIONS);
+			
+			logger.trace("testAtSpot: Before PutLights");
 			lights = PutLights.putLights(walls, initialLightLocation, numLights, radians);
+			logger.trace("testAtSpot: After PutLights");
 
 			// run the test
 			runSimulation(3000, new GameListener() {
@@ -107,6 +111,8 @@ public class MosquitoBuster extends Player {
 					}
 				}
 			});
+			logger.debug("Game ended. x="+x+" y="+y+" trial(of "+NUM_REPETITIONS+")="+i+" radians="+radians
+					+" simRounds.add("+simRounds.get(simRounds.size()-1)+")");
 		}
 
 		// Get the sum, avg
@@ -134,8 +140,8 @@ public class MosquitoBuster extends Player {
 
 		initialLightLocation = new Point2D.Double(x, y);
 
-		for (int i = 0; i < 30; i++) {
-			final double radians = i * (2.0 * Math.PI / 30.0);
+		for (int i = 0; i < NUM_REPETITIONS; i++) {
+			final double radians = i * (2.0 * Math.PI / (double) NUM_REPETITIONS);
 			final int testId = i;
 			lights = PutLights.putLights(walls, initialLightLocation, numLights, radians);
 			mapLights.put(testId, lights);
