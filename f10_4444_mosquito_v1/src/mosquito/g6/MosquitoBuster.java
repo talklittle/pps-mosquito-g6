@@ -2,6 +2,7 @@ package mosquito.g6;
 
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
@@ -60,8 +61,8 @@ public class MosquitoBuster extends Player {
 		double[][] spots = new double[2*101][2*101];
 		double[] fastestCoordinate = {0,0};
 
-		for (double i = 0; i < 101; i+=0.5) {
-			for (double j = 0; j < 101; j+=0.5) {
+		for (double i = 0; i < 100; i+=0.5) {
+			for (double j = 0; j < 100; j+=0.5) {
 				spots[(int) (2*i)][(int) (2*j)] = testAtSpot(i, j); // test at spot does simulation in that coordinate
 				if(j-0.5 >= 0)
 				{
@@ -185,8 +186,11 @@ public class MosquitoBuster extends Player {
 
 
 	private boolean isIntersectingLight(Point2D point) {
+		Rectangle2D pointRect = new Rectangle2D.Double(point.getX()-0.5, point.getY()-0.5, 1.0, 1.0);
 		for (Light light : lights) {
-			if (point.distance(light.getLocation()) < 0.5)
+			Rectangle2D lightRect = new Rectangle2D.Double(light.getX()-0.5, light.getY()-0.5, 1.0, 1.0);
+//			if (point.distance(light.getLocation()) < 0.5)
+			if (pointRect.intersects(lightRect))
 				return true;
 		}
 		return false;
@@ -194,24 +198,47 @@ public class MosquitoBuster extends Player {
 
 	@Override
 	public Collector getCollector() {
-		Point2D collectorLocation = new Point2D.Double(initialLightLocation.getX()+0.5, initialLightLocation.getY()+0.5);
+		
+		logger.debug("enter getCollector");
+		
+		// try the 4 diagonals
+		Point2D collectorLocation = new Point2D.Double(initialLightLocation.getX()-0.5, initialLightLocation.getY()-0.5);
+		if (CollideWithWall.isCollideWithWall(collectorLocation, walls) || OutOfBounds.isOutOfBounds(collectorLocation))
+			collectorLocation = new Point2D.Double(initialLightLocation.getX()+0.5, initialLightLocation.getY()-0.5);
+		if (CollideWithWall.isCollideWithWall(collectorLocation, walls) || OutOfBounds.isOutOfBounds(collectorLocation))
+			collectorLocation = new Point2D.Double(initialLightLocation.getX()-0.5, initialLightLocation.getY()+0.5);
+		if (CollideWithWall.isCollideWithWall(collectorLocation, walls) || OutOfBounds.isOutOfBounds(collectorLocation))
+			collectorLocation = new Point2D.Double(initialLightLocation.getX()+0.5, initialLightLocation.getY()+0.5);
+		
+		logger.debug("tested 4 diagonals");
+		
 		// move collector slightly if it's on a wall
 		while (CollideWithWall.isCollideWithWall(collectorLocation, walls) && collectorLocation.getX() < 99.9 && collectorLocation.getY() < 99.9)
 			collectorLocation = new Point2D.Double(collectorLocation.getX()+0.5, collectorLocation.getY()+0.5);
+		
+		logger.debug("after wall sanity check 1");
+		
 		// XXX if all else fails, use random location
-		while (CollideWithWall.isCollideWithWall(collectorLocation, walls))
+		while (CollideWithWall.isCollideWithWall(collectorLocation, walls) || OutOfBounds.isOutOfBounds(collectorLocation))
 			collectorLocation = new Point2D.Double(random.nextDouble() * 99.0, random.nextDouble() * 99.0);
+		
+		logger.debug("after wall sanity check 2");
 
 		// move collector if it's on a light
 		while (isIntersectingLight(collectorLocation) && collectorLocation.getX() < 99.9 && collectorLocation.getY() < 99.9)
 			collectorLocation = new Point2D.Double(collectorLocation.getX()+0.5, collectorLocation.getY()+0.5);
+		
+		logger.debug("after light sanity check 1");
+		
 		// XXX if all else fails, use random location
-		while (isIntersectingLight(collectorLocation))
-			collectorLocation = new Point2D.Double(random.nextDouble() * 99.0, random.nextDouble() * 99.0);
+		while (isIntersectingLight(collectorLocation) || OutOfBounds.isOutOfBounds(collectorLocation))
+			collectorLocation = new Point2D.Double(random.nextDouble() * 99.5, random.nextDouble() * 99.5);
 
+		logger.debug("found collectorLocation: ("+collectorLocation.getX()+", "+collectorLocation.getY()+")");
+		
 		// for 1 light, just place it near the light
 		if (numLights == 1) {
-			Random r = new Random();
+//			Random r = new Random();
 			//Collector c = new Collector(lastLight.getX()+0.1,lastLight.getY() +0.1);
 			Collector c = new Collector(collectorLocation.getX(), collectorLocation.getY());
 			return c;
@@ -219,7 +246,7 @@ public class MosquitoBuster extends Player {
 		// for more than 1 light, place collector between the 2 closest lights
 		else {
 			// FIXME replace this
-			Random r = new Random();
+//			Random r = new Random();
 			//Collector c = new Collector(lastLight.getX()+0.1,lastLight.getY() +0.1);
 			Collector c = new Collector(collectorLocation.getX(), collectorLocation.getY());
 			return c;
