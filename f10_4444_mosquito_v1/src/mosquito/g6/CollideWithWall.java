@@ -8,10 +8,10 @@ public class CollideWithWall {
 		Line2D line = new Line2D.Double(first, next);
 		for (Line2D l : walls) {
 			if(l.intersectsLine(line)){
-				return false;
+				return true;
 			}
 		}
-		return true;
+		return false;
 	}
 	//Jon's function in Board
 	public static boolean isCollideWithWall(Point2D point, Set<Line2D> walls){
@@ -21,10 +21,10 @@ public class CollideWithWall {
 				MOSQUITO_EPSILON * 2, MOSQUITO_EPSILON * 2);
 		for (Line2D l : walls) {
 			if(l.intersects(pointRectangle)){
-				return false;
+				return true;
 			}
 		}
-		return true;
+		return false;
 	}
 	
 }
