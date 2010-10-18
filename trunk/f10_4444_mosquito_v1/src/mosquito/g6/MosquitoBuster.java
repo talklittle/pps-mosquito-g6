@@ -24,7 +24,7 @@ public class MosquitoBuster extends Player {
 	private static Set<Light> lights;
 	private static Point2D initialLightLocation;
 	
-	private static final int NUM_REPETITIONS = 10;
+	private static final int NUM_REPETITIONS = 1;
 
 	private static final Random random = new Random();
 
@@ -120,7 +120,7 @@ public class MosquitoBuster extends Player {
 		for (Integer rounds : simRounds) {
 			sum += rounds;
 		}
-		int average = sum / simRounds.size();
+		int average = (simRounds.size() > 0) ? (sum / simRounds.size()) : 3000;
 
 		return average;
 	}
@@ -184,21 +184,6 @@ public class MosquitoBuster extends Player {
 
 
 
-	/**
-	 * 
-	 * @param point The point
-	 * @param distance Distance in meters considered "close". 
-	 * @return
-	 */
-	private boolean isNearWall(Point2D point, double distance) {
-		for (Line2D wall : walls) {
-			if (Geometry.getPointLineDistance(point, wall) <= distance) {
-				return true;
-			}
-		}
-		return false;
-	}
-
 	private boolean isIntersectingLight(Point2D point) {
 		for (Light light : lights) {
 			if (point.distance(light.getLocation()) < 0.5)
@@ -209,17 +194,17 @@ public class MosquitoBuster extends Player {
 
 	@Override
 	public Collector getCollector() {
-		Point2D collectorLocation = new Point2D.Double(initialLightLocation.getX()+0.1, initialLightLocation.getY()+0.1);
+		Point2D collectorLocation = new Point2D.Double(initialLightLocation.getX()+0.5, initialLightLocation.getY()+0.5);
 		// move collector slightly if it's on a wall
-		while (isNearWall(collectorLocation, 0.5) && collectorLocation.getX() < 99 && collectorLocation.getY() < 99)
-			collectorLocation = new Point2D.Double(collectorLocation.getX()+0.1, collectorLocation.getY()+0.1);
+		while (CollideWithWall.isCollideWithWall(collectorLocation, walls) && collectorLocation.getX() < 99.9 && collectorLocation.getY() < 99.9)
+			collectorLocation = new Point2D.Double(collectorLocation.getX()+0.5, collectorLocation.getY()+0.5);
 		// XXX if all else fails, use random location
-		while (isNearWall(collectorLocation, 0.5))
+		while (CollideWithWall.isCollideWithWall(collectorLocation, walls))
 			collectorLocation = new Point2D.Double(random.nextDouble() * 99.0, random.nextDouble() * 99.0);
 
 		// move collector if it's on a light
-		while (isIntersectingLight(collectorLocation) && collectorLocation.getX() < 99 && collectorLocation.getY() < 99)
-			collectorLocation = new Point2D.Double(collectorLocation.getX()+0.1, collectorLocation.getY()+0.1);
+		while (isIntersectingLight(collectorLocation) && collectorLocation.getX() < 99.9 && collectorLocation.getY() < 99.9)
+			collectorLocation = new Point2D.Double(collectorLocation.getX()+0.5, collectorLocation.getY()+0.5);
 		// XXX if all else fails, use random location
 		while (isIntersectingLight(collectorLocation))
 			collectorLocation = new Point2D.Double(random.nextDouble() * 99.0, random.nextDouble() * 99.0);
