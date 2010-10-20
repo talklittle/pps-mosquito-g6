@@ -3,6 +3,7 @@ package mosquito.g6;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.Random;
 import java.util.Set;
 
@@ -11,6 +12,8 @@ import mosquito.sim.Light;
 public class PutLights {
 	
 	private static Random random = new Random();
+	private static LinkedList list;
+	
 	
 	public static Set<Light> putLights(Set<Line2D> walls, Point2D base, int numLight, double initialRadient){
 		if(CollideWithWall.isCollideWithWall(base, walls) || OutOfBounds.isOutOfBounds(base)){
@@ -63,5 +66,18 @@ public class PutLights {
 			}
 			return result;
 		}
+	}
+	public static Point2D.Double collectorPlace()
+	{
+		int length = list.size();
+		
+		int midLength = length/2;
+		
+		
+		
+		
+		
+		return null;
+		
 	}
 }
