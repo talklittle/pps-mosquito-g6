@@ -80,11 +80,27 @@ public class PutLights {
 		 */
 		int maxTime = 20 + midLength*20; 
 		
+		/* To get the location of middle light, and put the collector there */
 		Point2D.Double collectorPlacement = (Double) list.get(midLength).getLocation();
 		
-		
+
+		int right = 0;
+		/* To add the time to the lights to the right of the center light */
 		for(int midRight = midLength + 1; midRight < list.size(); midRight++)
 		{
+			right = right + 20;
+			list.get(midRight).setD(maxTime);
+			list.get(midRight).setT(right);
+		}
+		
+		int left = 0;
+		/* To add the time to the lights to the left of the center light */
+		for(int midLeft = midLength -1; midLeft >=0; midLeft--)
+		{
+			left = left + 20;
+			list.get(midLeft).setD(maxTime);
+			list.get(midLeft).setT(left);
+			
 		}
 		
 		return collectorPlacement;
