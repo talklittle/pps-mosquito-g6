@@ -2,7 +2,6 @@ package mosquito.g6;
 
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -30,8 +29,11 @@ public class MosquitoBuster extends Player {
 	private static long beginTime, endTime;
 	
 	private static final int NUM_REPETITIONS = 1;
-	private static final long CUTOFF_MILLIS = 54 * 60 * 1000;
-
+//	private static final long CUTOFF_MILLIS = 54 * 60 * 1000;
+	private static final long CUTOFF_MILLIS = 5 * 1000;
+	
+	final double DIAGONAL = 0.36; // 0.5 * sin 45d
+	
 	private static final Random random = new Random();
 
 	private static final Logger logger = Logger.getLogger(MosquitoBuster.class);
@@ -225,11 +227,8 @@ public class MosquitoBuster extends Player {
 
 
 	private boolean isIntersectingLight(Point2D point) {
-		Rectangle2D pointRect = new Rectangle2D.Double(point.getX()-0.5, point.getY()-0.5, 1.0, 1.0);
 		for (Light light : lights) {
-			Rectangle2D lightRect = new Rectangle2D.Double(light.getX()-0.5, light.getY()-0.5, 1.0, 1.0);
-//			if (point.distance(light.getLocation()) < 0.5)
-			if (pointRect.intersects(lightRect))
+			if (point.distance(light.getLocation()) < 0.5)
 				return true;
 		}
 		return false;
@@ -243,39 +242,46 @@ public class MosquitoBuster extends Player {
 //		Point2D.Double collectorSpot = PutLights.collectorPlace();
 		Point2D collectorSpot = initialLightLocation;
 
-		
 		// try the 4 diagonals
-		Point2D collectorLocation = new Point2D.Double(collectorSpot.getX()-0.5, collectorSpot.getY()-0.5);
+		Point2D collectorLocation = new Point2D.Double(collectorSpot.getX()-DIAGONAL, collectorSpot.getY()-DIAGONAL);
 		if (CollideWithWall.isCollideWithWall(collectorLocation, walls) || OutOfBounds.isOutOfBounds(collectorLocation))
-			collectorLocation = new Point2D.Double(collectorSpot.getX()+0.5, collectorSpot.getY()-0.5);
+			collectorLocation = new Point2D.Double(collectorSpot.getX()+DIAGONAL, collectorSpot.getY()-DIAGONAL);
 		if (CollideWithWall.isCollideWithWall(collectorLocation, walls) || OutOfBounds.isOutOfBounds(collectorLocation))
-			collectorLocation = new Point2D.Double(collectorSpot.getX()-0.5, collectorSpot.getY()+0.5);
+			collectorLocation = new Point2D.Double(collectorSpot.getX()-DIAGONAL, collectorSpot.getY()+DIAGONAL);
 		if (CollideWithWall.isCollideWithWall(collectorLocation, walls) || OutOfBounds.isOutOfBounds(collectorLocation))
-			collectorLocation = new Point2D.Double(collectorSpot.getX()+0.5, collectorSpot.getY()+0.5);
+			collectorLocation = new Point2D.Double(collectorSpot.getX()+DIAGONAL, collectorSpot.getY()+DIAGONAL);
 		
 		logger.debug("tested 4 diagonals");
 		
 		// move collector slightly if it's on a wall
-		while (CollideWithWall.isCollideWithWall(collectorLocation, walls) && collectorLocation.getX() < 99.9 && collectorLocation.getY() < 99.9)
-			collectorLocation = new Point2D.Double(collectorLocation.getX()+0.5, collectorLocation.getY()+0.5);
+		while (CollideWithWall.isCollideWithWall(collectorLocation, walls) && collectorLocation.getX() < 99.9 && collectorLocation.getY() < 99.9) {
+			logger.warn("collector overlap wall");
+			collectorLocation = new Point2D.Double(collectorLocation.getX()+DIAGONAL, collectorLocation.getY()+DIAGONAL);
+		}
 		
 		logger.debug("after wall sanity check 1");
 		
 		// XXX if all else fails, use random location
-		while (CollideWithWall.isCollideWithWall(collectorLocation, walls) || OutOfBounds.isOutOfBounds(collectorLocation))
+		while (CollideWithWall.isCollideWithWall(collectorLocation, walls) || OutOfBounds.isOutOfBounds(collectorLocation)) {
+			logger.warn("collector still overlap wall");
 			collectorLocation = new Point2D.Double(random.nextDouble() * 99.0, random.nextDouble() * 99.0);
+		}
 		
 		logger.debug("after wall sanity check 2");
 
 		// move collector if it's on a light
-		while (isIntersectingLight(collectorLocation) && collectorLocation.getX() < 99.9 && collectorLocation.getY() < 99.9)
-			collectorLocation = new Point2D.Double(collectorLocation.getX()+0.5, collectorLocation.getY()+0.5);
+		while (isIntersectingLight(collectorLocation) && collectorLocation.getX() < 99.9 && collectorLocation.getY() < 99.9) {
+			logger.warn("collector overlap light");
+			collectorLocation = new Point2D.Double(collectorLocation.getX()+DIAGONAL, collectorLocation.getY()+DIAGONAL);
+		}
 		
 		logger.debug("after light sanity check 1");
 		
 		// XXX if all else fails, use random location
-		while (isIntersectingLight(collectorLocation) || OutOfBounds.isOutOfBounds(collectorLocation))
+		while (isIntersectingLight(collectorLocation) || OutOfBounds.isOutOfBounds(collectorLocation)) {
+			logger.warn("collector still overlap light");
 			collectorLocation = new Point2D.Double(random.nextDouble() * 99.5, random.nextDouble() * 99.5);
+		}
 
 		logger.debug("found collectorLocation: ("+collectorLocation.getX()+", "+collectorLocation.getY()+")");
 		

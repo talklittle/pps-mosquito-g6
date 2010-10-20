@@ -2,7 +2,6 @@ package mosquito.g6;
 
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
-import java.awt.geom.Point2D.Double;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Random;
@@ -57,7 +56,9 @@ public class PutLights {
 		HelperLight pedal = new HelperLight(pedalPoint.getX(), pedalPoint.getY(), -1, -1, -1);
 		pedal.setBase(base);
 		pedal.setPhase(phase);
-		if(CollideWithWall.isCollideWithWall(pedalPoint, walls)||CollideWithWall.isCollideWithWall(base.getPoint(), pedalPoint, walls)||CollideWithWall.isCollideWithOtherLights(pedal, lights)){
+		if(CollideWithWall.isCollideWithWall(pedalPoint, walls)||CollideWithWall.isCollideWithWall(base.getPoint(), pedalPoint, walls)
+				||CollideWithWall.isCollideWithOtherLights(pedal, lights)
+				|| OutOfBounds.isOutOfBounds(pedal.getPoint())){
 			return putLightsRecursive(walls, base, numLight, radient+stepSmall, lights, radius, phase, numLightPlaced, thereIsOneLightInPhase, lightsInPhase);
 		}
 		pedal.setD(60);
@@ -79,18 +80,23 @@ public class PutLights {
 		
 		if(CollideWithWall.isCollideWithWall(base.getPoint(), walls) || OutOfBounds.isOutOfBounds(base.getPoint())){
 			return null;
+		}
+		
+		// Increase stepLarge if we have fewer than 8 lights
+		if (numLight < 8) {
+			stepLarge = 360.0 / numLight;
+		}
+		
+		HelperLight l = new HelperLight(base.getX(),base.getY(), 1,1,1);
+		l.setBase(null);
+		l.setPhase(0);
+		Set<HelperLight> lights = new HashSet<HelperLight>();
+		lights.add(base);
+		Set<HelperLight> lightsInPhase = new HashSet<HelperLight>();
+		if(numLight==1){
+			return lights;
 		}else{
-			HelperLight l = new HelperLight(base.getX(),base.getY(), 1,1,1);
-			l.setBase(null);
-			l.setPhase(0);
-			Set<HelperLight> lights = new HashSet<HelperLight>();
-			lights.add(base);
-			Set<HelperLight> lightsInPhase = new HashSet<HelperLight>();
-			if(numLight==1){
-				return lights;
-			}else{
-				return putLightsRecursive(walls, base, numLight,0,lights,19.9, 1, 1, false, lightsInPhase);
-			}
+			return putLightsRecursive(walls, base, numLight,0,lights,19.9, 1, 1, false, lightsInPhase);
 		}
 	}
 	
