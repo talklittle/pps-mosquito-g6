@@ -227,14 +227,17 @@ public class MosquitoBuster extends Player {
 		
 		logger.debug("enter getCollector");
 		
+		Point2D.Double collectorSpot = PutLights.collectorPlace();
+
+		
 		// try the 4 diagonals
-		Point2D collectorLocation = new Point2D.Double(initialLightLocation.getX()-0.5, initialLightLocation.getY()-0.5);
+		Point2D collectorLocation = new Point2D.Double(collectorSpot.getX()-0.5, collectorSpot.getY()-0.5);
 		if (CollideWithWall.isCollideWithWall(collectorLocation, walls) || OutOfBounds.isOutOfBounds(collectorLocation))
-			collectorLocation = new Point2D.Double(initialLightLocation.getX()+0.5, initialLightLocation.getY()-0.5);
+			collectorLocation = new Point2D.Double(collectorSpot.getX()+0.5, collectorSpot.getY()-0.5);
 		if (CollideWithWall.isCollideWithWall(collectorLocation, walls) || OutOfBounds.isOutOfBounds(collectorLocation))
-			collectorLocation = new Point2D.Double(initialLightLocation.getX()-0.5, initialLightLocation.getY()+0.5);
+			collectorLocation = new Point2D.Double(collectorSpot.getX()-0.5, collectorSpot.getY()+0.5);
 		if (CollideWithWall.isCollideWithWall(collectorLocation, walls) || OutOfBounds.isOutOfBounds(collectorLocation))
-			collectorLocation = new Point2D.Double(initialLightLocation.getX()+0.5, initialLightLocation.getY()+0.5);
+			collectorLocation = new Point2D.Double(collectorSpot.getX()+0.5, collectorSpot.getY()+0.5);
 		
 		logger.debug("tested 4 diagonals");
 		
@@ -262,22 +265,8 @@ public class MosquitoBuster extends Player {
 
 		logger.debug("found collectorLocation: ("+collectorLocation.getX()+", "+collectorLocation.getY()+")");
 		
-		// for 1 light, just place it near the light
-		if (numLights == 1) {
-//			Random r = new Random();
-			//Collector c = new Collector(lastLight.getX()+0.1,lastLight.getY() +0.1);
-			Collector c = new Collector(collectorLocation.getX(), collectorLocation.getY());
-			return c;
+		Collector c = new Collector(collectorLocation.getX(), collectorLocation.getY());
+		
+		return c;
 		}
-		// for more than 1 light, place collector between the 2 closest lights
-		else {
-			// FIXME replace this
-//			Random r = new Random();
-			//Collector c = new Collector(lastLight.getX()+0.1,lastLight.getY() +0.1);
-			Collector c = new Collector(collectorLocation.getX(), collectorLocation.getY());
-			return c;
-		}
-	}
-
-
 }
