@@ -16,6 +16,10 @@ public class HelperLight {
 		this.t = t;
 		this.s = s;
 	}
+	
+	public Light getLight() {
+		return new Light(x, y, d, t, s);
+	}
 
 	public double getX() {
 		return x;
