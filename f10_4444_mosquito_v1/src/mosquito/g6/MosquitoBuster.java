@@ -6,6 +6,7 @@ import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
 
@@ -114,7 +115,13 @@ public class MosquitoBuster extends Player {
 			double radians = i * (2.0 * Math.PI / (double) NUM_REPETITIONS);
 			
 			logger.trace("testAtSpot: Before PutLights");
-			lights = PutLights.putLights(walls, initialLightLocation, numLights, radians);
+//			lights = PutLights.putLights(walls, initialLightLocation, numLights, radians);
+			Set<HelperLight> helperLights =
+				PutLights.putLights(walls, new HelperLight(initialLightLocation.getX(), initialLightLocation.getY(), 1, 1, 1), numLights);
+			lights = new HashSet<Light>();
+			for (HelperLight hl : helperLights) {
+				lights.add(hl.getLight());
+			}
 			logger.trace("testAtSpot: After PutLights");
 
 			// run the test
@@ -164,7 +171,13 @@ public class MosquitoBuster extends Player {
 		for (int i = 0; i < NUM_REPETITIONS; i++) {
 			final double radians = i * (2.0 * Math.PI / (double) NUM_REPETITIONS);
 			final int testId = i;
-			lights = PutLights.putLights(walls, initialLightLocation, numLights, radians);
+//			lights = PutLights.putLights(walls, new HelperLight(initialLightLocation.getX(), initialLightLocation.getY(), 1, 1, 1), numLights);
+			Set<HelperLight> helperLights =
+				PutLights.putLights(walls, new HelperLight(initialLightLocation.getX(), initialLightLocation.getY(), 1, 1, 1), numLights);
+			lights = new HashSet<Light>();
+			for (HelperLight hl : helperLights) {
+				lights.add(hl.getLight());
+			}
 			mapLights.put(testId, lights);
 
 			// run the test
@@ -227,7 +240,8 @@ public class MosquitoBuster extends Player {
 		
 		logger.debug("enter getCollector");
 		
-		Point2D.Double collectorSpot = PutLights.collectorPlace();
+//		Point2D.Double collectorSpot = PutLights.collectorPlace();
+		Point2D collectorSpot = initialLightLocation;
 
 		
 		// try the 4 diagonals
