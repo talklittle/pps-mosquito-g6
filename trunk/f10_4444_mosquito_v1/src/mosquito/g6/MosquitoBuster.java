@@ -26,7 +26,8 @@ public class MosquitoBuster extends Player {
 	private static Set<Light> lights;
 	private static Point2D initialLightLocation;
 	
-	private static long beginTime, endTime;
+	private static long beginTime;
+	private static int bestNumRounds = 3000;
 	
 	private static final int NUM_REPETITIONS = 1;
 //	private static final long CUTOFF_MILLIS = 54 * 60 * 1000;
@@ -59,6 +60,7 @@ public class MosquitoBuster extends Player {
 
 	public Set<Light> getLightPositions() {
 		double[] startSpot = getStartSpot();
+		bestNumRounds = 3000;
 		Set<Light> lightPositions = testLightPositions(startSpot[0], startSpot[1]);
 		return lightPositions;
 	}
@@ -127,7 +129,7 @@ public class MosquitoBuster extends Player {
 			logger.trace("testAtSpot: After PutLights");
 
 			// run the test
-			runSimulation(3000, new GameListener() {
+			runSimulation(bestNumRounds, new GameListener() {
 				@Override
 				public void gameUpdated(GameUpdateType type) {
 					if(type.equals(GameUpdateType.MOVEPROCESSED))
@@ -141,6 +143,8 @@ public class MosquitoBuster extends Player {
 					}
 				}
 			});
+			if (simRounds.get(simRounds.size()-1) < bestNumRounds)
+				bestNumRounds = simRounds.get(simRounds.size()-1);
 			logger.debug("Game ended. x="+x+" y="+y+" trial(of "+NUM_REPETITIONS+")="+i+" radians="+radians
 					+" simRounds.add("+simRounds.get(simRounds.size()-1)+")");
 		}
@@ -183,7 +187,7 @@ public class MosquitoBuster extends Player {
 			mapLights.put(testId, lights);
 
 			// run the test
-			runSimulation(3000, new GameListener() {
+			runSimulation(bestNumRounds, new GameListener() {
 				@Override
 				public void gameUpdated(GameUpdateType type) {
 					if(type.equals(GameUpdateType.MOVEPROCESSED))
@@ -197,13 +201,15 @@ public class MosquitoBuster extends Player {
 					}
 				}
 			});
+			if (mapRounds.get(testId) < bestNumRounds)
+				bestNumRounds = mapRounds.get(testId);
 		}
 
 		// get the Set<Light> associated with the min
 		int minKey = 0;
-		int minRounds = 3000;
+		int minRounds = bestNumRounds;
 		for (Integer key : mapRounds.keySet()) {
-			if (mapRounds.get(key) < minRounds) {
+			if (mapRounds.get(key) <= minRounds) {
 				minRounds = mapRounds.get(key);
 				minKey = key;
 			}
