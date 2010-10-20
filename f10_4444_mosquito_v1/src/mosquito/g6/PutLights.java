@@ -30,73 +30,49 @@ public class PutLights {
 		return lights;
 	}
 	
-	private static Set<HelperLight> putLightsRecursive(Set<Line2D> walls, HelperLight base, int numLightLeft, double radient, Set<HelperLight> lights, 
+	private static Set<HelperLight> putLightsRecursive(Set<Line2D> walls, HelperLight base, int numLight, double radient, Set<HelperLight> lights, 
 			double radius, int phase, int numLightPlaced, boolean thereIsOneLightInPhase, Set<HelperLight> lightsInPhase){
 		//terminate constraints
-		if(numLightLeft<=0){
+		if(numLight<=numLightPlaced){
 			return lights;
 		}
 		if(numLightPlaced>=maximumLights){
-			lights = putLightRandom(walls, lights, numLightLeft);
+			lights = putLightRandom(walls, lights, numLight-numLightPlaced);
 			return lights;
 		}
 		if(radius<=0){
 			return lights;
 		}
 		if((radient>=360)&&!thereIsOneLightInPhase){
-			return putLightsRecursive(walls, base, numLightLeft, 0, lights, radius-5, phase, numLightPlaced, false, new HashSet<HelperLight>());
+			return putLightsRecursive(walls, base, numLight, 0, lights, radius-5, phase, numLightPlaced, false, new HashSet<HelperLight>());
 		}
 		if((radient>=360&&thereIsOneLightInPhase)){
 			//move to another phase
 			for(HelperLight l: lightsInPhase){
-				lights
+				lights = putLightsRecursive(walls, l, numLight, 0, lights, 19.9, phase+1, numLightPlaced, false, new HashSet<HelperLight>());
 			}
-			return putLightsRecursive(walls, )
+			return lights;
 		}
-		//flowery
-		Point2D pedal = new Point2D.Double(base.getX()+(radius*Math.cos(radient)), base.getY()+(radius*Math.sin(radient)));
-		if(CollideWithWall.isCollideWithWall(pedal, walls)){
-			return putLightsRecursive(walls, base, numLightLeft, radient+stepSmall, lights, radius, phase, numLightPlaced);
+		Point2D pedalPoint = new Point2D.Double(base.getX()+(radius*Math.cos(radient)), base.getY()+(radius*Math.sin(radient)));
+		HelperLight pedal = new HelperLight(pedalPoint.getX(), pedalPoint.getY(), -1, -1, -1);
+		pedal.setBase(base);
+		pedal.setPhase(phase);
+		if(CollideWithWall.isCollideWithWall(pedalPoint, walls)||CollideWithWall.isCollideWithWall(base.getPoint(), pedalPoint, walls)||CollideWithWall.isCollideWithOtherLights(pedal, lights)){
+			return putLightsRecursive(walls, base, numLight, radient+stepSmall, lights, radius, phase, numLightPlaced, thereIsOneLightInPhase, lightsInPhase);
 		}
+		pedal.setD(60);
+		pedal.setT(24);
+		pedal.setS(24*(2-(phase-1)%3));
+		lights.add(pedal);
+		lightsInPhase.add(pedal);
+		return putLightsRecursive(walls, base, numLight, radient+stepLarge, lights, radius, phase, numLightPlaced+1, true, lightsInPhase);
 		// try to span flowery...  do each phase.
 		// if step to 360 and light left, reduce radius and start everything again
 		// For each light in the same phase,
 		// hit wall, step small
 		// if collide with other lights, step small
 		// if not any of them, put lights and step large
-		
-		
-		Point2D next;
-		int phase = 1;
-		int pedalIndex = 0;
-		int numPlacedThisPhase = 0;
-		int numLightPerPhase;
-		while(numPlaced < numLight){
-			if(pedalIndex==(phase*8)){
-				// If we couldn't place any during this phase, quit
-				if (numPlacedThisPhase == 0) {
-					// TODO a good way to place the remaining lights
-					
-				}
-				pedalIndex = 0;
-				numPlacedThisPhase = 0;
-				phase++;
-			}
-			numLightPerPhase = Math.min(phase*8, numLight);
-			next = new Point2D.Double(base.getX()+((19.9*phase)*Math.cos(initialRadient+(pedalIndex*2*Math.PI/numLightPerPhase))),
-					base.getY()+((19.9*phase)*Math.sin(initialRadient+(pedalIndex*2*Math.PI/numLightPerPhase))));
-			if(CollideWithWall.isCollideWithWall(base, next, walls) || OutOfBounds.isOutOfBounds(next)){
-				pedalIndex++;
-			}else{
-				list.add(next);
-				l = new Light(next.getX(), next.getY(), 60, 24, 24*(2-(phase-1)%3));
-				result.add(l);
-				pedalIndex++;
-				numPlaced++;
-				numPlacedThisPhase++;
-			}
-		}
-		return result;
+
 	}
 	
 	public static Set<HelperLight> putLights(Set<Line2D> walls, HelperLight base, int numLight){
@@ -113,7 +89,7 @@ public class PutLights {
 			if(numLight==1){
 				return lights;
 			}else{
-				return putLightsRecursive(walls, base, numLight-1,0,lights,19.9, 1, 1, false, lightsInPhase);
+				return putLightsRecursive(walls, base, numLight,0,lights,19.9, 1, 1, false, lightsInPhase);
 			}
 		}
 	}
