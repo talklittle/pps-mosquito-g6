@@ -3,24 +3,24 @@ package mosquito.g6;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Point2D.Double;
+import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.Random;
 import java.util.Set;
-
-import mosquito.sim.Light;
 
 public class PutLights {
 	
 	private static Random random = new Random();
 	
 	private static Set<HelperLight> putLightRandom(Set<Line2D> walls, Set<HelperLight> lights, int numLightLeft){
-		for ( ; numPlaced < numLightLeft; numPlaced++) {
+		Point2D next;
+		ArrayList<Point2D> list = new ArrayList<Point2D>();
+		for (int i = 0; i < numLightLeft; i++) {
 			do {
 				next = new Point2D.Double(random.nextDouble() * 100.0, random.nextDouble() * 100.0);
 				list.add(next);
 			} while (CollideWithWall.isCollideWithWall(next, walls));
-			l = new HelperLight(next.getX(), next.getY(), 1, 0, 0);
+			HelperLight l = new HelperLight(next.getX(), next.getY(), 1, 0, 0);
 			lights.add(l);
 		}
 		return lights;
