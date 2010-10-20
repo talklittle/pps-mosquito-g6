@@ -93,43 +93,44 @@ public class PutLights {
 			}
 		}
 	}
-	public static Point2D.Double collectorPlace()
-	{
-		int length = list.size();
-		
-		int midLength = length/2; /* rounds down naturally */
-		
-		/* start at 20 and for each light we go out,
-		 * we add 20 seconds to the maximum. This will be each
-		 * light's d-value 
-		 */
-		int maxTime = 20 + midLength*20; 
-		
-		/* To get the location of middle light, and put the collector there */
-		Point2D.Double collectorPlacement = (Double) list.get(midLength).getLocation();
-		
-
-		int right = 0;
-		/* To add the time to the lights to the right of the center light */
-		for(int midRight = midLength + 1; midRight < list.size(); midRight++)
-		{
-			right = right + 20;
-			list.get(midRight).setD(maxTime);
-			list.get(midRight).setT(right);
-		}
-		
-		int left = 0;
-		/* To add the time to the lights to the left of the center light */
-		for(int midLeft = midLength -1; midLeft >=0; midLeft--)
-		{
-			left = left + 20;
-			list.get(midLeft).setD(maxTime);
-			list.get(midLeft).setT(left);
-			
-		}
-		
-		return collectorPlacement;
-		
-	}
+	
+//	public static Point2D.Double collectorPlace()
+//	{
+//		int length = list.size();
+//		
+//		int midLength = length/2; /* rounds down naturally */
+//		
+//		/* start at 20 and for each light we go out,
+//		 * we add 20 seconds to the maximum. This will be each
+//		 * light's d-value 
+//		 */
+//		int maxTime = 20 + midLength*20; 
+//		
+//		/* To get the location of middle light, and put the collector there */
+//		Point2D.Double collectorPlacement = (Double) list.get(midLength).getLocation();
+//		
+//
+//		int right = 0;
+//		/* To add the time to the lights to the right of the center light */
+//		for(int midRight = midLength + 1; midRight < list.size(); midRight++)
+//		{
+//			right = right + 20;
+//			list.get(midRight).setD(maxTime);
+//			list.get(midRight).setT(right);
+//		}
+//		
+//		int left = 0;
+//		/* To add the time to the lights to the left of the center light */
+//		for(int midLeft = midLength -1; midLeft >=0; midLeft--)
+//		{
+//			left = left + 20;
+//			list.get(midLeft).setD(maxTime);
+//			list.get(midLeft).setT(left);
+//			
+//		}
+//		
+//		return collectorPlacement;
+//		
+//	}
 	
 }
