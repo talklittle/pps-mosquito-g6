@@ -2,7 +2,6 @@ package mosquito.g6;
 
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
@@ -10,18 +9,16 @@ import java.util.Set;
 public class PutLights {
 	
 	private static Random random = new Random();
-	private static double stepSmall = 15;
-	private static double stepLarge = 45;
+	private static double stepSmall = Math.toRadians(15);
+	private static double stepLarge = Math.toRadians(45);
 	private static int maximumLights = 20;
 	
 	
 	private static Set<HelperLight> putLightRandom(Set<Line2D> walls, Set<HelperLight> lights, int numLightLeft){
 		Point2D next;
-		ArrayList<Point2D> list = new ArrayList<Point2D>();
 		for (int i = 0; i < numLightLeft; i++) {
 			do {
 				next = new Point2D.Double(random.nextDouble() * 100.0, random.nextDouble() * 100.0);
-				list.add(next);
 			} while (CollideWithWall.isCollideWithWall(next, walls));
 			HelperLight l = new HelperLight(next.getX(), next.getY(), 1, 0, 0);
 			lights.add(l);
@@ -30,25 +27,26 @@ public class PutLights {
 	}
 	
 	private static Set<HelperLight> putLightsRecursive(Set<Line2D> walls, HelperLight base, int numLight, double radient, Set<HelperLight> lights, 
-			double radius, int phase, int numLightPlaced, boolean thereIsOneLightInPhase, Set<HelperLight> lightsInPhase){
+			double radius, int phase, int numLightPlaced, Set<HelperLight> lightsInPhase){
 		//terminate constraints
 		if(numLight<=numLightPlaced){
 			return lights;
 		}
-		if(numLightPlaced>=maximumLights){
-			lights = putLightRandom(walls, lights, numLight-numLightPlaced);
-			return lights;
-		}
+//		if(numLightPlaced>=maximumLights){
+//			return putLightRandom(walls, lights, numLight-numLightPlaced);
+//		}
 		if(radius<=0){
 			return lights;
 		}
-		if((radient>=360)&&!thereIsOneLightInPhase){
-			return putLightsRecursive(walls, base, numLight, 0, lights, radius-5, phase, numLightPlaced, false, new HashSet<HelperLight>());
+		if((radient>= 2*Math.PI) && lightsInPhase.isEmpty()){
+			return putLightsRecursive(walls, base, numLight, 0, lights, radius-5, phase, numLightPlaced, new HashSet<HelperLight>());
 		}
-		if((radient>=360&&thereIsOneLightInPhase)){
+		if((radient>= 2*Math.PI) && !lightsInPhase.isEmpty()){
 			//move to another phase
 			for(HelperLight l: lightsInPhase){
-				lights = putLightsRecursive(walls, l, numLight, 0, lights, 19.9, phase+1, numLightPlaced, false, new HashSet<HelperLight>());
+				int sizeNow = lights.size();
+				lights = putLightsRecursive(walls, l, numLight, 0, lights, 19.9, phase+1, numLightPlaced, new HashSet<HelperLight>());
+				numLightPlaced += lights.size() - sizeNow;
 			}
 			return lights;
 		}
@@ -57,16 +55,16 @@ public class PutLights {
 		pedal.setBase(base);
 		pedal.setPhase(phase);
 		if(CollideWithWall.isCollideWithWall(pedalPoint, walls)||CollideWithWall.isCollideWithWall(base.getPoint(), pedalPoint, walls)
-				||CollideWithWall.isCollideWithOtherLights(pedal, lights)
+				||CollideWithWall.isCollideWithOtherLights(pedal, lights, walls)
 				|| OutOfBounds.isOutOfBounds(pedal.getPoint())){
-			return putLightsRecursive(walls, base, numLight, radient+stepSmall, lights, radius, phase, numLightPlaced, thereIsOneLightInPhase, lightsInPhase);
+			return putLightsRecursive(walls, base, numLight, radient+stepSmall, lights, radius, phase, numLightPlaced, lightsInPhase);
 		}
 		pedal.setD(60);
 		pedal.setT(24);
 		pedal.setS(24*(2-(phase-1)%3));
 		lights.add(pedal);
 		lightsInPhase.add(pedal);
-		return putLightsRecursive(walls, base, numLight, radient+stepLarge, lights, radius, phase, numLightPlaced+1, true, lightsInPhase);
+		return putLightsRecursive(walls, base, numLight, radient+stepLarge, lights, radius, phase, numLightPlaced+1, lightsInPhase);
 		// try to span flowery...  do each phase.
 		// if step to 360 and light left, reduce radius and start everything again
 		// For each light in the same phase,
@@ -84,7 +82,7 @@ public class PutLights {
 		
 		// Increase stepLarge if we have fewer than 8 lights
 		if (numLight < 8) {
-			stepLarge = 360.0 / numLight;
+			stepLarge = Math.toRadians(360.0 / (double) numLight);
 		}
 		
 		HelperLight l = new HelperLight(base.getX(),base.getY(), 1,1,1);
@@ -96,8 +94,13 @@ public class PutLights {
 		if(numLight==1){
 			return lights;
 		}else{
-			return putLightsRecursive(walls, base, numLight,0,lights,19.9, 1, 1, false, lightsInPhase);
+			lights = putLightsRecursive(walls, base, numLight,0,lights,19.9, 1, 1, lightsInPhase);
+			if (lights.size() < numLight) {
+				return putLightRandom(walls, lights, numLight-lights.size());
+			}
+			return lights;
 		}
+		
 	}
 	
 //	public static Point2D.Double collectorPlace()
