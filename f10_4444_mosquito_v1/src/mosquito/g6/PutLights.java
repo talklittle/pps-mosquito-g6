@@ -13,8 +13,9 @@ import mosquito.sim.Light;
 public class PutLights {
 	
 	private static Random random = new Random();
-	private static LinkedList<Light> list;
+	public static LinkedList<Point2D> list;
 	
+	//test
 	
 	public static Set<Light> putLights(Set<Line2D> walls, Point2D base, int numLight, double initialRadient){
 		if(CollideWithWall.isCollideWithWall(base, walls) || OutOfBounds.isOutOfBounds(base)){
@@ -22,6 +23,8 @@ public class PutLights {
 		}else{
 			int numPlaced = 0;
 			Light l = new Light(base.getX(),base.getY(), 1,1,1);
+			list = new LinkedList<Point2D>();
+			list.add(base);
 			Set<Light> result = new HashSet<Light>();
 			result.add(l);
 			if(numLight==1){
@@ -42,6 +45,7 @@ public class PutLights {
 						for ( ; numPlaced < numLight; numPlaced++) {
 							do {
 								next = new Point2D.Double(random.nextDouble() * 100.0, random.nextDouble() * 100.0);
+								list.add(next);
 							} while (CollideWithWall.isCollideWithWall(next, walls));
 							l = new Light(next.getX(), next.getY(), 1, 0, 0);
 							result.add(l);
@@ -58,6 +62,7 @@ public class PutLights {
 				if(CollideWithWall.isCollideWithWall(base, next, walls) || OutOfBounds.isOutOfBounds(next)){
 					pedalIndex++;
 				}else{
+					list.add(next);
 					l = new Light(next.getX(), next.getY(), 60, 24, 24*(2-(phase-1)%3));
 					result.add(l);
 					pedalIndex++;
