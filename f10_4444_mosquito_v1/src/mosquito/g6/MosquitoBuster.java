@@ -27,11 +27,12 @@ public class MosquitoBuster extends Player {
 	private static Point2D initialLightLocation;
 	
 	private static long beginTime;
-	private static int bestNumRounds = 3000;
+	private static int bestNumRounds = 4000;
 	
 	private static final int NUM_REPETITIONS = 1;
-//	private static final long CUTOFF_MILLIS = 54 * 60 * 1000;
-	private static final long CUTOFF_MILLIS = 5 * 1000;
+	private static final int ORIGINAL_BEST_NUM_ROUNDS = 4000;
+	private static final long CUTOFF_MILLIS = 54 * 60 * 1000;
+//	private static final long CUTOFF_MILLIS = 5 * 1000;
 	
 	final double DIAGONAL = 0.36; // 0.5 * sin 45d
 	
@@ -60,7 +61,7 @@ public class MosquitoBuster extends Player {
 
 	public Set<Light> getLightPositions() {
 		double[] startSpot = getStartSpot();
-		bestNumRounds = 3000;
+		bestNumRounds = ORIGINAL_BEST_NUM_ROUNDS;
 		Set<Light> lightPositions = testLightPositions(startSpot[0], startSpot[1]);
 		return lightPositions;
 	}
@@ -154,7 +155,7 @@ public class MosquitoBuster extends Player {
 		for (Integer rounds : simRounds) {
 			sum += rounds;
 		}
-		int average = (simRounds.size() > 0) ? (sum / simRounds.size()) : 3000;
+		int average = (simRounds.size() > 0) ? (sum / simRounds.size()) : ORIGINAL_BEST_NUM_ROUNDS;
 
 		return average;
 	}

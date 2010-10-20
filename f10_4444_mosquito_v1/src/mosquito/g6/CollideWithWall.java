@@ -1,6 +1,9 @@
 package mosquito.g6;
 import java.awt.geom.*;
+import java.util.HashSet;
 import java.util.Set;
+
+import mosquito.sim.Light;
 
 public class CollideWithWall {
 
@@ -27,17 +30,22 @@ public class CollideWithWall {
 		return false;
 	}
 	
-	public static boolean isCollideWithOtherLights(HelperLight current, Set<HelperLight> lights){
+	public static boolean isCollideWithOtherLights(HelperLight current, Set<HelperLight> lights, Set<Line2D> walls){
+		
+		HashSet<HelperLight> otherLights = new HashSet<HelperLight>();
 		
 		for (HelperLight l : lights) {
-			if(!current.getBase().equals(l.getBase())){
-				double distance = Math.sqrt(Math.pow(current.getX()-l.getX(), 2)+(Math.pow(current.getY()-l.getY(), 2)));
-				if(distance<=40){
-					if(!current.getBase().equals(l)){
-						return true;
-					}
-				}
-			}
+			// skip the base, and skip siblings (who share the same base)
+			if (current.getBase() == l || current.getBase() == l.getBase())
+				continue;
+			otherLights.add(l);
+//			double distance = Math.sqrt(Math.pow(current.getX()-l.getX(), 2)+(Math.pow(current.getY()-l.getY(), 2)));
+//			double distance = new Point2D.Double(current.getX(), current.getY()).distance(l.getX(), l.getY());
+			
+//			if(distance<=40){
+		}
+		if (!(SightChecker.getInSight(current, otherLights, walls).isEmpty())) {
+			return true;
 		}
 		return false;
 		
