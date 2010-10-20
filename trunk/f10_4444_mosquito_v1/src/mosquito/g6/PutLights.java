@@ -11,6 +11,10 @@ import java.util.Set;
 public class PutLights {
 	
 	private static Random random = new Random();
+	private static double stepSmall = 15;
+	private static double stepLarge = 45;
+	private static int maximumLights = 20;
+	
 	
 	private static Set<HelperLight> putLightRandom(Set<Line2D> walls, Set<HelperLight> lights, int numLightLeft){
 		Point2D next;
@@ -27,21 +31,39 @@ public class PutLights {
 	}
 	
 	private static Set<HelperLight> putLightsRecursive(Set<Line2D> walls, HelperLight base, int numLightLeft, double radient, Set<HelperLight> lights, 
-			boolean reach360, double radius, int phase, int numLightPlaced){
-		
-		if(numLightLeft==0){
+			double radius, int phase, int numLightPlaced, boolean thereIsOneLightInPhase, Set<HelperLight> lightsInPhase){
+		//terminate constraints
+		if(numLightLeft<=0){
 			return lights;
 		}
-		if(numLightPlaced==20){
+		if(numLightPlaced>=maximumLights){
 			lights = putLightRandom(walls, lights, numLightLeft);
 			return lights;
 		}
+		if(radius<=0){
+			return lights;
+		}
+		if((radient>=360)&&!thereIsOneLightInPhase){
+			return putLightsRecursive(walls, base, numLightLeft, 0, lights, radius-5, phase, numLightPlaced, false, new HashSet<HelperLight>());
+		}
+		if((radient>=360&&thereIsOneLightInPhase)){
+			//move to another phase
+			for(HelperLight l: lightsInPhase){
+				lights
+			}
+			return putLightsRecursive(walls, )
+		}
+		//flowery
+		Point2D pedal = new Point2D.Double(base.getX()+(radius*Math.cos(radient)), base.getY()+(radius*Math.sin(radient)));
+		if(CollideWithWall.isCollideWithWall(pedal, walls)){
+			return putLightsRecursive(walls, base, numLightLeft, radient+stepSmall, lights, radius, phase, numLightPlaced);
+		}
 		// try to span flowery...  do each phase.
-		//hit wall, step small
-		//if collide with other lights, step small
-		if()
-		
-		
+		// if step to 360 and light left, reduce radius and start everything again
+		// For each light in the same phase,
+		// hit wall, step small
+		// if collide with other lights, step small
+		// if not any of them, put lights and step large
 		
 		
 		Point2D next;
@@ -79,7 +101,7 @@ public class PutLights {
 	
 	public static Set<HelperLight> putLights(Set<Line2D> walls, HelperLight base, int numLight){
 		
-		if(CollideWithWall.isCollideWithWall(base, walls) || OutOfBounds.isOutOfBounds(base.getPoint())){
+		if(CollideWithWall.isCollideWithWall(base.getPoint(), walls) || OutOfBounds.isOutOfBounds(base.getPoint())){
 			return null;
 		}else{
 			HelperLight l = new HelperLight(base.getX(),base.getY(), 1,1,1);
@@ -87,10 +109,11 @@ public class PutLights {
 			l.setPhase(0);
 			Set<HelperLight> lights = new HashSet<HelperLight>();
 			lights.add(base);
+			Set<HelperLight> lightsInPhase = new HashSet<HelperLight>();
 			if(numLight==1){
 				return lights;
 			}else{
-				return putLightsRecursive(walls, base, numLight-1,0,lights,false,19.9, 1, 1);
+				return putLightsRecursive(walls, base, numLight-1,0,lights,19.9, 1, 1, false, lightsInPhase);
 			}
 		}
 	}
