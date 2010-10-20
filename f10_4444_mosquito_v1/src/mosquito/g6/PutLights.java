@@ -2,6 +2,7 @@ package mosquito.g6;
 
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
+import java.awt.geom.Point2D.Double;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Random;
@@ -12,7 +13,7 @@ import mosquito.sim.Light;
 public class PutLights {
 	
 	private static Random random = new Random();
-	private static LinkedList list;
+	private static LinkedList<Light> list;
 	
 	
 	public static Set<Light> putLights(Set<Line2D> walls, Point2D base, int numLight, double initialRadient){
@@ -71,13 +72,22 @@ public class PutLights {
 	{
 		int length = list.size();
 		
-		int midLength = length/2;
+		int midLength = length/2; /* rounds down naturally */
+		
+		/* start at 20 and for each light we go out,
+		 * we add 20 seconds to the maximum. This will be each
+		 * light's d-value 
+		 */
+		int maxTime = 20 + midLength*20; 
+		
+		Point2D.Double collectorPlacement = (Double) list.get(midLength).getLocation();
 		
 		
+		for(int midRight = midLength + 1; midRight < list.size(); midRight++)
+		{
+		}
 		
-		
-		
-		return null;
+		return collectorPlacement;
 		
 	}
 }
