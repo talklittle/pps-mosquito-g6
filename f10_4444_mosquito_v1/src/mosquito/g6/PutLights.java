@@ -77,7 +77,7 @@ public class PutLights {
 	public static Set<HelperLight> putLights(Set<Line2D> walls, HelperLight base, int numLight){
 		
 		if(CollideWithWall.isCollideWithWall(base.getPoint(), walls) || OutOfBounds.isOutOfBounds(base.getPoint())){
-			return null;
+			return new HashSet<HelperLight>();
 		}
 		
 		// Increase stepLarge if we have fewer than 8 lights
